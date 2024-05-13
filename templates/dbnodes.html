@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ .Title }}</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    </head>
+<body>
+    <div class="container">
+        <table class="table table-striped-columns table-striped ">
+            <thead>
+               
+                <tr><th colspan="2">&nbsp;</th></th><th class="text-center" colspan="{{ len .Status.Nodes }}"><h2>Node</h2></th></tr>
+                <tr>
+                    <th colspan="2">&nbsp;</th>
+                    {{ range .Status.Nodes }}
+                        <th class="text-end">{{.Id}} {{ if .Quorum }}<span class="text-info-emphasis">Quorum</span>{{end}}</th>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <th colspan="2">Cores</th>
+                    {{ range .Status.Nodes }}
+                        <th class="text-end">{{.Cores}}</th>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <th colspan="2">Total Shards</th>
+                    {{ range .Status.Nodes }}
+                        <th class="text-end">{{.ShardUsage.InUse }}</th>
+                    {{ end }}
+                </tr>
+                <tr><th><h2>Database</h2></th><th class="text-end">Total Shards</th><th colspan="{{ len .Status.Nodes }}">&nbsp;</th></tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {{ $nodes := .Status.Nodes }}
+                {{ range .Status.Databases }}
+                    <tr>
+                    {{ $db := . }}
+                    <th>{{ .Name }}</th>
+                    <td class="text-end">{{.ShardCount }}</td>
+
+                    {{ range $nodes }}
+                        {{ $shards := $db.OnNode .Id }}
+                        <td><div class="btn-group" role="Group" arial-label="shards">
+
+                            {{ if eq $shards.Masters 0 }}
+                                <button type="button" class="btn btn-light  text-body-tertiary">0</button>
+                            {{ else }}
+                                <button type="button" class="btn btn-primary">{{$shards.Masters}}</button>
+                            {{ end }}
+
+
+                            {{ if eq $shards.Replicas 0 }}
+                                <button type="button" class="btn btn-light text-body-tertiary">0</button>
+                            {{ else }}
+                                <button type="button" class="btn btn-secondary">{{$shards.Replicas}}</button>
+                            {{ end }} 
+                        </div></td>
+                    {{ end }}
+                    </tr>
+                    {{ end }}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
