@@ -108,7 +108,7 @@ func NewClusterInfo(in io.Reader) (*ClusterInfo, error) {
 		info.TimeStamp = ts
 	}
 
-	return info, err
+	return info, nil
 }
 
 func (c *ClusterInfo) DatabasesWithNodes() DatabasesWithNodes {

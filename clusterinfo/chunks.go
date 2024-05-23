@@ -17,19 +17,18 @@ import (
 // Chunks is used to store the output of the base parser.
 type Chunks struct {
 	Intro     string
-	Cluster   string
 	Nodes     []byte
 	Databases []byte
 	Endpoints []byte
 	Shards    []byte
 }
 
-var marker = regexp.MustCompile(`^[A-Z ]+:$`)
+var marker = regexp.MustCompile(`^([A-Z ]+):$`)
 var spaceReplacer = regexp.MustCompile(`[\t\f\r ]+`)
 var endpointCleaner = regexp.MustCompile(`\+\d+`)
 
 const (
-	ChunkIntro = iota
+	ChunkNone = iota
 	ChunkCluster
 	ChunkNodes
 	ChunkDatabases
@@ -37,18 +36,26 @@ const (
 	ChunkShards
 )
 
+var chunkMap = map[string]int{
+	"CLUSTER":       ChunkCluster,
+	"CLUSTER NODES": ChunkNodes,
+	"DATABASES":     ChunkDatabases,
+	"ENDPOINTS":     ChunkEndpoints,
+	"SHARDS":        ChunkShards,
+}
+
 func (c *Chunks) Parse(input io.Reader) error {
 
 	current := make([]byte, 0)
 
-	where := ChunkIntro
+	where := ChunkNone
 	scanner := bufio.NewScanner(input)
 
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		if marker.Match(line) {
+		if newChunk := c.whichChunk(line); newChunk != ChunkNone {
 			c.putData(current, where)
-			where++
+			where = newChunk
 			current = make([]byte, 0)
 		} else {
 			line := append(bytes.TrimSpace(line), '\n')
@@ -68,10 +75,8 @@ func (c *Chunks) Parse(input io.Reader) error {
 func (c *Chunks) putData(data []byte, stage int) {
 	if len(data) > 0 {
 		switch stage {
-		case ChunkIntro:
-			c.Intro = string(data) // Don't convert this
-		case ChunkCluster:
-			c.Cluster = string(data) // Don't convert this
+		case ChunkNone:
+			c.Intro = c.Intro + "\n" + string(data) // Don't convert this
 		case ChunkNodes:
 			c.Nodes = c.toCSV(data)
 		case ChunkDatabases:
@@ -104,6 +109,22 @@ func (c *Chunks) ExtractTimeStamp() (time.Time, error) {
 		return time.Now(), fmt.Errorf("rlatool - timestamp not found in input")
 	} else {
 		return time.Parse("2006-01-02 03:04:05.000000-07:00", lines[1])
+	}
+
+}
+
+// Get the id of the chunk we've encountered
+func (c *Chunks) whichChunk(line []byte) int {
+
+	matched := marker.FindSubmatch(line)
+	if len(matched) <= 1 {
+		return ChunkNone
+	} else {
+		if which, ok := chunkMap[string(matched[1])]; ok {
+			return which
+		} else {
+			return ChunkNone
+		}
 	}
 
 }
