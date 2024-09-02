@@ -12,6 +12,8 @@ require (
 
 require (
 	github.com/gocarina/gocsv v0.0.0-20240520201108-78e41c74b4b1 // indirect
-	github.com/goslogan/clusterinfo v0.1.0
+	github.com/goslogan/clusterinfo v0.1.2
 	github.com/spf13/cobra v1.8.1
 )
+
+replace github.com/goslogan/clusterinfo => /Users/nic.gibson/Projects/clusterinfo
