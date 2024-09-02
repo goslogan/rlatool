@@ -16,4 +16,3 @@ require (
 	github.com/spf13/cobra v1.8.1
 )
 
-replace github.com/goslogan/clusterinfo => /Users/nic.gibson/Projects/clusterinfo
