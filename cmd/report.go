@@ -7,7 +7,7 @@ import (
 	h "html/template"
 	t "text/template"
 
-	"github.com/goslogan/rlatool/clusterinfo"
+	"github.com/goslogan/clusterinfo"
 	"github.com/spf13/cobra"
 )
 

@@ -6,7 +6,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/goslogan/rlatool/clusterinfo"
+	"github.com/goslogan/clusterinfo"
 	"github.com/spf13/cobra"
 )
 

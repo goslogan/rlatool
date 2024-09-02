@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/goslogan/rlatool/clusterinfo"
+	"github.com/goslogan/clusterinfo"
 	"github.com/spf13/cobra"
 )
 
